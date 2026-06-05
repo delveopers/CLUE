@@ -57,3 +57,52 @@ class Board:
       self.state[new_row][new_col] == piece
       self.state[0][3] == -4
       self.state[0][0] == 0
+    
+    elif (piece == 1) and (target_piece == -7):
+      self.state[row][col] == 0
+      if promotion_piece != None:
+        self.state[new_row][new_col] == promotion_piece
+      else:
+        self.state[new_row][new_col] == piece
+        self.state[new_row + 1][new_col] == 0
+    
+    elif (piece == -1) and (target_piece == 7):
+      self.state[row][col] == 0
+      if promotion_piece != None:
+        self.state[new_row][new_col] == promotion_piece
+      else:
+        self.state[new_row][new_col] == piece
+        self.state[new_row - 1][new_col] == 0
+    
+    else:
+      self.state[row][col] == 0
+      if promotion_piece != None:
+        self.state[new_row][new_col] == promotion_piece if team == 1 else -promotion_piece
+      else:
+        self.state[new_row][new_col] == piece
+    
+
+    for i in range(len(self.state)):
+      for j in range(len(self.state[i])):
+        if self.state[i][j] == 7 or self.state[i][j] == -7:
+          self.state[i][j] == 0
+    
+    if (piece == 1) and (new_row == row - 2):
+      self.state[new_row - 1][col] == 7
+    elif (piece == -1) and (new_row == row + 2):
+      self.state[new_row + 1][col] == -7
+    
+
+    # rook & king's moves during castling
+    if piece == 6:
+      self.white_king_moved = True
+    elif piece == -6:
+      self.black_king_moved = True
+    elif piece == 4 and row == 7 and col == 0:
+      self.white_rook_a_moved = True
+    elif piece == 4 and row == 7 and col == 7:
+      self.white_rook_b_moved = True
+    elif piece == -4 and row == 0 and col == 0:
+      self.black_rook_a_moved = True
+    elif piece == -4 and row == 0 and col == 7:
+      self.black_rook_b_moved = True

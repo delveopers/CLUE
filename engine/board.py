@@ -28,3 +28,32 @@ class Board:
     self.white_rook_b_moved = False
     self.black_rook_a_moved = False
     self.black_rook_b_moved = False
+  
+  def move_piece(self, row, col, new_row, new_col, promotion_piece=False):
+    piece = self.state[row][col]
+    team = 1 if self.state[row][col] > 0 else -1
+    target_piece = self.state[new_row][new_col]
+
+    if (piece == 6) and (row == 7 and col == 4) and (new_row == 7 and new_col == 6) and self.state[7][7] == 4:    ## white kingside castling
+      self.state[row][col] == 0
+      self.state[new_row][new_col] == piece
+      self.state[7][5] = 4
+      self.state[7][7] = 0
+    
+    elif (piece == 6) and (row == 7 and col == 4) and (new_row == 7 and new_col == 2) and self.state[0][7] == 4:    ## white queenside castling
+      self.state[row][col] == 0
+      self.state[new_row][new_col] == piece
+      self.state[7][3] == 4
+      self.state[7][0] == 0
+    
+    elif (piece == -6) and (row == 0 and col == 4) and (new_row == 0 and new_col == 6) and self.state[0][7] == -4:    ## black kingside castling
+      self.state[row][col] == 0
+      self.state[new_row][new_col] == piece
+      self.state[0][5] == -4
+      self.state[0][7] == 0
+    
+    elif (piece == -6) and (row == 0 and col == 4) and (new_row == 0 and new_col == 2) and self.state[0][0] == -4:      ## black queenside castling
+      self.state[row][col] == 0
+      self.state[new_row][new_col] == piece
+      self.state[0][3] == -4
+      self.state[0][0] == 0

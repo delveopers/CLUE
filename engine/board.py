@@ -149,3 +149,39 @@ class Board:
               r, c = i[0], i[1]
               if self.state[r][c] == -2:
                 white_in_check = True
+          
+          # for bishop
+          legal_moves = []
+          legal_moves += self.long_range_recursion(col, row, -1, -1, team)
+          legal_moves += self.long_range_recursion(col, row, 1, 1, team)
+          legal_moves += self.long_range_recursion(col, row, -1, 1, team)
+          legal_moves += self.long_range_recursion(col, row, 1, -1, team)
+
+          for i in legal_moves:
+            r, c = i[0], i[1]
+            if self.state[r][c] == -3 or self.state[r][c] == -5:
+              white_in_check = True
+
+          # for rook
+          legal_moves = []
+          legal_moves += self.long_range_recursion(col, row, 1, 0, team)
+          legal_moves += self.long_range_recursion(col, row, 0, 1, team)
+          legal_moves += self.long_range_recursion(col, row, -1, 0, team)
+          legal_moves += self.long_range_recursion(col, row, 0, -1, team)
+
+          for i in legal_moves:
+            r, c = i[0], i[1]
+            if self.state[r][c] == -4 or self.state[r][c] == -5:
+              white_in_check = True
+
+          # for king
+          king_moves = ((row + 1, col + 1), (row, col + 1), (row + 1, col), (row, col - 1), (row - 1, col), (row - 1, col - 1), (row + 1, col - 1), (row - 1, col + 1))
+          for i in king_moves:
+            if i[0] >= 0 and i[1] >= 0 and i[0] <= 7 and i[1] <= 7:
+              r, c = i[0], i[1]
+              if self.state[r][c] == -6:
+                white_in_check = True
+        elif self.state[row][col] == -6: ## black king
+          black_king_pos, team = (row, col), -1
+
+          # for pawns

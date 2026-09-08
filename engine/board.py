@@ -185,3 +185,95 @@ class Board:
           black_king_pos, team = (row, col), -1
 
           # for pawns
+          if row +1 <= 7:
+            if col + 1 <= 7 and self.state[row+1][col+1] == 1:
+              black_in_check = True
+            if col - 1 >= 0 and self.state[row+1][col-1] == 1:
+              black_in_check = True
+          
+          knight_moves = ((row + 2, col + 1), (row - 2, col + 1), (row + 2, col - 1), (row - 2, col - 1), (row + 1, col - 2), (row - 1, col - 2), (row - 1, col + 2), (row + 1, col + 2))
+          for i in knight_moves:
+            if i[0] >= 0 and i[1] >= 1 and i[0] <= 7 and i[1] <= 7:
+              r, c = i[0], i[1]
+              if self.state[r][c] == 2:
+                black_in_check == True
+          
+
+          # for bishops / queen (diagonal)
+          legal_moves = []
+          legal_moves += self.long_range_recursion(row, col, -1, -1, team)
+          legal_moves += self.long_range_recursion(row, col, 1, -1, team)
+          legal_moves += self.long_range_recursion(row, col, -1, 1, team)
+          legal_moves += self.long_range_recursion(row, col, 1, 1, team)
+
+          for i in legal_moves:
+            r, c = i[0], i[1]
+            if self.state[r][c] == 3 or self.state[r][c] == 5:
+              black_in_check = True
+
+          # for rook / queen (straights)
+          legal_moves = []
+          legal_moves += self.long_range_recursion(row, col, 1, 0, team)
+          legal_moves += self.long_range_recursion(row, col, -1, 0, team)
+          legal_moves += self.long_range_recursion(row, col, 0, 1, team)
+          legal_moves += self.long_range_recursion(row, col, 0, -1, team)
+
+          for i in legal_moves:
+            r, c = i[0], i[1]
+            if self.state[r][c] == 4 or self.state[r][c] == 5:
+              black_in_check = True
+
+          king_moves = ((row + 1, col - 1), (row - 1, col + 1), (row + 1, col + 1), (row - 1, col - 1), (row, col + 1), (row + 1, col), (row - 1, col), (row, col - 1))
+          for i in king_moves:
+            if i[0] >= 0 and i[1] >= 0 and i[0] <= 7 and i[1] <= 7:
+              r, c = i[0], i[1]
+              if self.state[r][c] == 6:
+                black_in_check = True
+    if not white_in_check:
+      white_king_pos = None
+    if not black_in_check:
+      black_king_pos = None
+
+  def get_legal_moves(self, row, col):
+    piece = self.state[row][col]
+    legal_moves = []
+    team = 1 if self.state[row][col] > 0 else -1
+
+    if piece == 1:    # white pawn
+      pawn_moves = []   # row, col, piece
+      legal_row = row - 1   # moving forward, row decreases
+      if legal_row == 0:
+        pawn_moves.append((legal_row, col, 2))
+        pawn_moves.append((legal_row, col, 3))
+        pawn_moves.append((legal_row, col, 4))
+        pawn_moves.append((legal_row, col, 5))
+      else:
+        pawn_moves.append((legal_row, col, None))
+
+      pawn_captures = []
+      if legal_row == 0:
+        pawn_captures.append((legal_row, col-1, 2))
+        pawn_captures.append((legal_row, col-1, 3))
+        pawn_captures.append((legal_row, col-1, 4))
+        pawn_captures.append((legal_row, col-1, 5))
+        pawn_captures.append((legal_row, col+1, 2))
+        pawn_captures.append((legal_row, col+1, 3))
+        pawn_captures.append((legal_row, col+1, 4))
+        pawn_captures.append((legal_row, col+1, 5))
+      else:
+        pawn_captures.append((legal_row, col-1, None))
+        pawn_captures.append((legal_row, col+1, None))
+
+      if row == 6:  # if on starting square, allow two
+        legal_row_2 = row - 2   # moving forward, two rows at a time
+        pawn_moves.append((legal_row_2, col, None))
+
+      for i in pawn_moves:
+        if i[0] >= 0 and i[1] >= 0 and i[1] <= 7 and i[1] <= 7:
+          if self.state[i[0]][i[1]] == 0:
+            legal_moves.append((i))
+
+      for i in pawn_captures:
+        if i[0] >= 0 and i[1] >= 0 and i[1] <= 0 and i[1] <= 7:
+          if self.state[i[0]][i[1]] < 0:
+            legal_moves.append((i))

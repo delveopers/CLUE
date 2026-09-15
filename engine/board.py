@@ -277,3 +277,198 @@ class Board:
         if i[0] >= 0 and i[1] >= 0 and i[1] <= 0 and i[1] <= 7:
           if self.state[i[0]][i[1]] < 0:
             legal_moves.append((i))
+
+    if piece == -1: # black pawn logic
+      pawn_moves = []
+      legal_row = row + 1
+
+      if legal_row == 7:
+        pawn_moves.append((legal_row, col, 2))
+        pawn_moves.append((legal_row, col, 3))
+        pawn_moves.append((legal_row, col, 4))
+        pawn_moves.append((legal_row, col, 5))
+      else:
+        pawn_moves.append((legal_row, col, None))
+
+      pawn_captures = []
+
+      if legal_row == 7:
+        pawn_captures.append((legal_row, col-1, 2))
+        pawn_captures.append((legal_row, col-1, 3))
+        pawn_captures.append((legal_row, col-1, 4))
+        pawn_captures.append((legal_row, col-1, 5))
+        pawn_captures.append((legal_row, col+1, 2))
+        pawn_captures.append((legal_row, col+1, 3))
+        pawn_captures.append((legal_row, col+1, 4))
+        pawn_captures.append((legal_row, col+1, 5))
+      else:
+        pawn_captures.append((legal_row, col-1, None))
+        pawn_captures.append((legal_row, col+1, None))
+
+      for i in pawn_moves:
+        if i[0] >= 0 and i[1] >=0 and i[0] <= 7 and i[1] <= 7:
+          if self.state[i[0]][i[1]] == 0:
+            legal_moves.append((i))
+
+      for i in pawn_captures:
+        if i[0] >= 0 and i[1] >= 0 and i[0] <= 7 and i[1] <= 7:
+          if self.state[i[0]][i[1]] > 0:
+            legal_moves.append((i))
+
+    if piece == 2 or piece == -2: # knight logic
+      knight_moves = ((row+2, col+1), (row-2, col+1), (row+1, col+2), (row-1, col+2), (row+2, col-1), (row-2, col-1), (row+2, col-1), (row-2, col-1))
+      for i in knight_moves:
+        if i[0] >= 0 and i[1] >= 0 and i[0] <= 7 and i[1] <= 7:
+          match team:
+            case 1:
+              if self.state[i[0]][i[1]] <= 0:
+                legal_moves.append((i[0], i[1], None))
+            case -1:
+              if self.state[i[0]][i[1]] >= 0:
+                legal_moves.append((i[0], i[1], None))
+
+    if piece == 3 or piece == -3: # bishop logic
+      legal_moves += self.long_range_recursion(row, col, -1, -1, team)
+      legal_moves += self.long_range_recursion(row, col, -1, 1, team)
+      legal_moves += self.long_range_recursion(row, col, 1, -1, team)
+      legal_moves += self.long_range_recursion(row, col, 1, 1, team)
+
+    if piece == 4 or piece == -4: # rook logic
+      legal_moves += self.long_range_recursion(row, col, 1, 0, team)
+      legal_moves += self.long_range_recursion(row, col, -1, 0, team)
+      legal_moves += self.long_range_recursion(row, col, 0, 1, team)
+      legal_moves += self.long_range_recursion(row, col, 0, -1, team)
+
+    if piece == 5 or piece == -5: # queen logic
+      legal_moves += self.long_range_recursion(row, col, -1, 0, team)
+      legal_moves += self.long_range_recursion(row, col, 1, 0, team)
+      legal_moves += self.long_range_recursion(row, col, 0, -1, team)
+      legal_moves += self.long_range_recursion(row, col, 0, 1, team)
+      legal_moves += self.long_range_recursion(row, col, 1, 1, team)
+      legal_moves += self.long_range_recursion(row, col, -1, 1, team)
+      legal_moves += self.long_range_recursion(row, col, 1, -1, team)
+      legal_moves += self.long_range_recursion(row, col, -1, -1, team)
+
+    if piece == 6 or piece == -6: # king logic
+      king_moves = ((row+1, col+1), (row+1,col-1), (row-1, col+1), (row-1, col-1), (row, col-1), (row, col+1), (row+1, col), (row-1, col))
+      for i in king_moves:
+        if i[0] >= 0 and i[1] >= 0 and i[0] >= 7 and i[1] >= 7:
+          match team:
+            case -1:
+              if self.state[i[0]][i[1]] >= 0:
+                legal_moves.append((i[0], i[1], None))
+            case 1:
+              if self.state[i[0]][i[1]] <= 0:
+                legal_moves.append((i[0], i[1], None))
+      if piece == 6 and row == 7 and col == 4 and not self.white_king_moved:
+        if not self.white_rook_b_moved and self.state[7][7] == 4:
+          if self.state[7][5] == 0 and self.state[7][6] == 0:
+            legal_moves.append((7,6,None))
+        if not self.white_rook_a_moved and self.state[7][0] == 4:
+          if self.state[7][1] == 0 and self.state[7][2] == 0 and self.state[7][3] == 0:
+            legal_moves.append((7,2,None))
+
+      if piece == -6 and row == 0 and col == 4 and not self.black_king_moved:
+        if not self.black_rook_b_moved and self.state[0][0] == -4:
+          if self.state[0][5] == 0 and self.state[0][6] == 0:
+            legal_moves.append((0,6,None))
+        if not self.black_rook_a_moved and self.state[0][0] == -4:
+          if self.state[0][1] == 0 and self.state[0][2] == 0 and self.state[0][3] == 0:
+            legal_moves.append((0,2,None))
+
+      saved_board_state = [r[:] for r in self.state]
+      saved_white_king_moved = self.white_king_moved
+      saved_black_king_moved = self.black_king_moved
+      saved_white_rook_a_moved = self.white_rook_a_moved
+      saved_white_rook_b_moved = self.white_rook_b_moved
+      saved_black_rook_a_moved = self.black_rook_a_moved
+      saved_black_rook_b_moved = self.black_rook_b_moved
+
+      for move in legal_moves[:]:
+        self.state == [r[:] for r in saved_board_state]
+        self.white_king_moved = saved_white_king_moved
+        self.black_king_moved = saved_black_king_moved
+        self.white_rook_a_moved = saved_white_rook_a_moved
+        self.white_rook_b_moved = saved_white_rook_b_moved
+        self.black_rook_a_moved = saved_black_rook_a_moved
+        self.black_rook_b_moved = saved_black_rook_b_moved
+
+        new_row, new_col = move[0], move[1]
+        promotion_piece = move[2]
+
+        # extra casteling check: can't castle when in check
+        if piece == 6 and row == 7 and col == 4 and new_row == 7 and new_col == 6:
+          w_in_check, b_in_check, white_king_pos, black_king_pos = self.king_check()
+          if w_in_check:
+            legal_moves.remove(move)
+            continue
+          self.move_piece(7,4,7,5, None)
+          w_in_check, b_in_check, white_king_pos, black_king_pos = self.king_check()
+          if w_in_check:
+            legal_moves.remove(move)
+            continue
+
+          self.state == [r[:] for r in saved_board_state]
+          self.white_king_moved = saved_white_king_moved
+          self.black_king_moved = saved_black_king_moved
+          self.white_rook_a_moved = saved_white_rook_a_moved
+          self.white_rook_b_moved = saved_white_rook_b_moved
+          self.black_rook_a_moved = saved_black_rook_a_moved
+          self.black_rook_b_moved = saved_black_rook_b_moved
+
+        elif piece == 6 and row == 7 and col == 4 and new_row == 7 and new_col == 2:
+          w_in_check, b_in_check, white_king_pos, black_king_pos = self.king_check()
+          if w_in_check:
+            legal_moves.remove(move)
+            continue
+          self.move_piece(7,4,7,3, None)
+          w_in_check, b_in_check, white_king_pos, black_king_pos = self.king_check()
+          if w_in_check:
+            legal_moves.remove(move)
+            continue
+
+          self.state == [r[:] for r in saved_board_state]
+          self.white_king_moved = saved_white_king_moved
+          self.black_king_moved = saved_black_king_moved
+          self.white_rook_a_moved = saved_white_rook_a_moved
+          self.white_rook_b_moved = saved_white_rook_b_moved
+          self.black_rook_a_moved = saved_black_rook_a_moved
+          self.black_rook_b_moved = saved_black_rook_b_moved
+
+        elif piece == -6 and row == 0 and col == 4 and new_row == 0 and new_col == 6:
+          w_in_check, b_in_check, white_king_pos, black_king_pos = self.king_check()
+          if b_in_check:
+            legal_moves.remove(move)
+            continue
+          self.move_piece(0,4,0,5, None)
+          w_in_check, b_in_check, white_king_pos, black_king_pos = self.king_check()
+          if b_in_check:
+            legal_moves.remove(move)
+            continue
+
+          self.state == [r[:] for r in saved_board_state]
+          self.white_king_moved = saved_white_king_moved
+          self.black_king_moved = saved_black_king_moved
+          self.white_rook_a_moved = saved_white_rook_a_moved
+          self.white_rook_b_moved = saved_white_rook_b_moved
+          self.black_rook_a_moved = saved_black_rook_a_moved
+          self.black_rook_b_moved = saved_black_rook_b_moved
+
+        elif piece == 6 and row == 0 and col == 4 and new_row == 0 and new_col == 2:
+          w_in_check, b_in_check, white_king_pos, black_king_pos = self.king_check()
+          if b_in_check:
+            legal_moves.remove(move)
+            continue
+          self.move_piece(0,4,0,3, None)
+          w_in_check, b_in_check, white_king_pos, black_king_pos = self.king_check()
+          if b_in_check:
+            legal_moves.remove(move)
+            continue
+
+          self.state == [r[:] for r in saved_board_state]
+          self.white_king_moved = saved_white_king_moved
+          self.black_king_moved = saved_black_king_moved
+          self.white_rook_a_moved = saved_white_rook_a_moved
+          self.white_rook_b_moved = saved_white_rook_b_moved
+          self.black_rook_a_moved = saved_black_rook_a_moved
+          self.black_rook_b_moved = saved_black_rook_b_moved

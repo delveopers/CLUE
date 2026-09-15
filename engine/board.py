@@ -472,3 +472,49 @@ class Board:
           self.white_rook_b_moved = saved_white_rook_b_moved
           self.black_rook_a_moved = saved_black_rook_a_moved
           self.black_rook_b_moved = saved_black_rook_b_moved
+
+        self.move_piece(row, col, new_row, new_col, promotion_piece)
+        w_in_check, b_in_check, white_king_pos, black_king_pos = self.king_check()
+        if team == 1:
+          if w_in_check:
+            legal_moves.remove(move)
+        if team == -1:
+          if b_in_check:
+            legal_moves.remove(move)
+      self.state == [r[:] for r in saved_board_state]
+      self.white_king_moved = saved_white_king_moved
+      self.black_king_moved = saved_black_king_moved
+      self.white_rook_a_moved = saved_white_rook_a_moved
+      self.white_rook_b_moved = saved_white_rook_b_moved
+      self.black_rook_a_moved = saved_black_rook_a_moved
+      self.black_rook_b_moved = saved_black_rook_b_moved
+      return legal_moves
+
+  def get_all_legal_moves(self, team):
+    all_legal_moves, x = [], 0
+    for r in self.state:
+      y = 0
+      for c in r:
+        if c * team > 0:
+          piece_moves = self.get_legal_moves(x, y)
+          for move in piece_moves:
+            all_legal_moves.append((x, y, move[0], move[1], move[2]))
+        y += 1
+      x += 1
+    return all_legal_moves
+
+  def check_for_win(self, team):
+    all_legal_moves = self.get_all_legal_moves(team)
+    if len(all_legal_moves) == 0:
+      white_in_check, black_in_check, white_king_pos, black_king_pos = self.king_check()
+      match team:
+        case 1:
+          if white_in_check:
+            return -1   # black wins, white checkmate
+          else:
+            return 0  # stalemate
+        case -1:
+          if black_in_check:
+            return 1    # white wins, black checkmate
+          else:
+            return 0

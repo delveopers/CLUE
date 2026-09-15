@@ -26,18 +26,18 @@ class Game:
     self.white_win, self.black_win, self.stalemate = False, False, False
 
     self.piece_images = {
-            1: pygame.transform.smoothscale(pygame.image.load('/img/w_pawn_png_1024px.png'), (self.piece_size, self.piece_size)),
-            2: pygame.transform.smoothscale(pygame.image.load('/img/w_knight_png_1024px.png'), (self.piece_size, self.piece_size)),
-            3: pygame.transform.smoothscale(pygame.image.load('/img/w_bishop_png_1024px.png'), (self.piece_size, self.piece_size)),
-            4: pygame.transform.smoothscale(pygame.image.load('/img/w_rook_png_1024px.png'), (self.piece_size, self.piece_size)),
-            5: pygame.transform.smoothscale(pygame.image.load('/img/w_queen_png_1024px.png'), (self.piece_size, self.piece_size)),
-            6: pygame.transform.smoothscale(pygame.image.load('/img/w_king_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -1: pygame.transform.smoothscale(pygame.image.load('/img/b_pawn_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -2: pygame.transform.smoothscale(pygame.image.load('/img/b_knight_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -3: pygame.transform.smoothscale(pygame.image.load('/img/b_bishop_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -4: pygame.transform.smoothscale(pygame.image.load('/img/b_rook_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -5: pygame.transform.smoothscale(pygame.image.load('/img/b_queen_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -6: pygame.transform.smoothscale(pygame.image.load('/img/b_king_png_1024px.png'), (self.piece_size, self.piece_size)),
+            1: pygame.transform.smoothscale(pygame.image.load('./engine/img/w_pawn_png_1024px.png'), (self.piece_size, self.piece_size)),
+            2: pygame.transform.smoothscale(pygame.image.load('./engine/img/w_knight_png_1024px.png'), (self.piece_size, self.piece_size)),
+            3: pygame.transform.smoothscale(pygame.image.load('./engine/img/w_bishop_png_1024px.png'), (self.piece_size, self.piece_size)),
+            4: pygame.transform.smoothscale(pygame.image.load('./engine/img/w_rook_png_1024px.png'), (self.piece_size, self.piece_size)),
+            5: pygame.transform.smoothscale(pygame.image.load('./engine/img/w_queen_png_1024px.png'), (self.piece_size, self.piece_size)),
+            6: pygame.transform.smoothscale(pygame.image.load('./engine/img/w_king_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -1: pygame.transform.smoothscale(pygame.image.load('./engine/img/b_pawn_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -2: pygame.transform.smoothscale(pygame.image.load('./engine/img/b_knight_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -3: pygame.transform.smoothscale(pygame.image.load('./engine/img/b_bishop_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -4: pygame.transform.smoothscale(pygame.image.load('./engine/img/b_rook_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -5: pygame.transform.smoothscale(pygame.image.load('./engine/img/b_queen_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -6: pygame.transform.smoothscale(pygame.image.load('./engine/img/b_king_png_1024px.png'), (self.piece_size, self.piece_size)),
         }
 
   def check_click(self):
@@ -75,7 +75,7 @@ class Game:
             col, row = board_x // self.square_size, board_y // self.square_size
             piece = self.board.state[row][col]
             if self.selected_square is not None:
-              moves = self.board.get_all_legal_moves(self.selected_square[0], self.selected_square[1])
+              moves = self.board.get_legal_moves(self.selected_square[0], self.selected_square[1])
               legal_clicked_square = False
 
               for move in moves:

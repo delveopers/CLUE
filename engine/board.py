@@ -139,7 +139,7 @@ class Board:
           if row - 1 > 0:
             if col + 1 < 7 and self.state[row-1][col+1] == -1:
               white_in_check = True
-            elif col - 1 >= 0 and self.state[row+1][col-1] == -1:
+            elif col - 1 >= 0 and self.state[row-1][col-1] == -1:
               white_in_check = True
           
           # check for knights
@@ -233,6 +233,7 @@ class Board:
       white_king_pos = None
     if not black_in_check:
       black_king_pos = None
+    return white_in_check, black_in_check, white_king_pos, black_king_pos
 
   def get_legal_moves(self, row, col):
     piece = self.state[row][col]
@@ -488,7 +489,8 @@ class Board:
       self.white_rook_b_moved = saved_white_rook_b_moved
       self.black_rook_a_moved = saved_black_rook_a_moved
       self.black_rook_b_moved = saved_black_rook_b_moved
-      return legal_moves
+
+    return legal_moves
 
   def get_all_legal_moves(self, team):
     all_legal_moves, x = [], 0

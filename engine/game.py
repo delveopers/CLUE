@@ -134,7 +134,7 @@ class Game:
                 if piece_team == self.active_team:
                   self.curr_row, self.curr_col, self.selected_square = row, col, (row, col)
       else:   # cpu takes turn
-        best_eval, best_move = self.search.minmax(self.board, -1, -2, -99999, 99999)
+        best_eval, best_move = self.search.minmax(self.board, -1, 2, -99999, 99999)
         print(best_move)
 
         if best_move is not None:

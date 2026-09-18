@@ -130,7 +130,7 @@ class Board:
 
           # checking for pawns
           if row - 1 > 0:
-            if col + 1 < 7 and self.state[row-1][col+1] == -1:
+            if col + 1 <= 7 and self.state[row-1][col+1] == -1:
               white_in_check = True
             elif col - 1 >= 0 and self.state[row-1][col-1] == -1:
               white_in_check = True
@@ -145,10 +145,10 @@ class Board:
 
           # for bishop
           legal_moves = []
-          legal_moves += self.long_range_recursion(col, row, -1, -1, team)
-          legal_moves += self.long_range_recursion(col, row, 1, 1, team)
-          legal_moves += self.long_range_recursion(col, row, -1, 1, team)
-          legal_moves += self.long_range_recursion(col, row, 1, -1, team)
+          legal_moves += self.long_range_recursion(row, col, -1, -1, team)
+          legal_moves += self.long_range_recursion(row, col, 1, 1, team)
+          legal_moves += self.long_range_recursion(row, col, -1, 1, team)
+          legal_moves += self.long_range_recursion(row, col, 1, -1, team)
 
           for i in legal_moves:
             r, c = i[0], i[1]
@@ -157,10 +157,10 @@ class Board:
 
           # for rook
           legal_moves = []
-          legal_moves += self.long_range_recursion(col, row, 1, 0, team)
-          legal_moves += self.long_range_recursion(col, row, 0, 1, team)
-          legal_moves += self.long_range_recursion(col, row, -1, 0, team)
-          legal_moves += self.long_range_recursion(col, row, 0, -1, team)
+          legal_moves += self.long_range_recursion(row, col, 1, 0, team)
+          legal_moves += self.long_range_recursion(row, col, 0, 1, team)
+          legal_moves += self.long_range_recursion(row, col, -1, 0, team)
+          legal_moves += self.long_range_recursion(row, col, 0, -1, team)
 
           for i in legal_moves:
             r, c = i[0], i[1]
@@ -186,7 +186,7 @@ class Board:
 
           knight_moves = ((row + 2, col + 1), (row - 2, col + 1), (row + 2, col - 1), (row - 2, col - 1), (row + 1, col - 2), (row - 1, col - 2), (row - 1, col + 2), (row + 1, col + 2))
           for i in knight_moves:
-            if i[0] >= 0 and i[1] >= 1 and i[0] <= 7 and i[1] <= 7:
+            if i[0] >= 0 and i[1] >= 0 and i[0] <= 7 and i[1] <= 7:
               r, c = i[0], i[1]
               if self.state[r][c] == 2:
                 black_in_check = True

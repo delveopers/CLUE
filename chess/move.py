@@ -1,9 +1,8 @@
-
 class Move:
   NORMAL, CASTLE_KINGSIDE, CASTLE_QUEENSIDE, EN_PASSANT = 0, 1, 2, 3
-  def __int__(self, from_row:int, from_col:int, to_row:int, to_col:int, promotion:int=None, flag:int=NORMAL):
-    self.from_row, self.from_col = from_row, from_col
-    self.to_row, self.to_col = to_row, to_col
+
+  def __init__(self, from_row, from_col, to_row, to_col, promotion=None, flag=NORMAL):
+    self.from_row, self.from_col, self.to_row, self.to_col = from_row, from_col, to_row, to_col
     self.promotion, self.flag = promotion, flag
 
   @property

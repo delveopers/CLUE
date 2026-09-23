@@ -1,4 +1,4 @@
-from .board import Board
+from .chess.board import Board
 
 # pawn(1) = 1
 # knight(2) = 3

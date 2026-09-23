@@ -1,6 +1,6 @@
 import glob
 import numpy as np
-import chess, h5py
+import engine.chess as chess, h5py
 from .level import PIECE_TO_CLASS, PIECE_TO_PLANE
 
 

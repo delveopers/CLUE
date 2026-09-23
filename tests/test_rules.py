@@ -1,5 +1,5 @@
-from ..chess.state import GameState
-from ..chess.rules import legal_moves, result, is_terminal, ONGOING, WHITE_WIN, BLACK_WIN, DRAW
+from ..engine.chess.state import GameState
+from ..engine.chess.rules import legal_moves, result, is_terminal, ONGOING, WHITE_WIN, BLACK_WIN, DRAW
 
 state = GameState.initial()
 print('initial position result (expect ongoing):', result(state))

@@ -1,7 +1,7 @@
 import random
-from ..chess.state import GameState
-from ..chess import zobrist
-from ..chess.rules import legal_moves
+from ..engine.chess.state import GameState
+from ..engine.chess import zobrist
+from ..engine.chess.rules import legal_moves
 
 state = GameState.initial()
 assert state.hash == zobrist.compute_hash(state)

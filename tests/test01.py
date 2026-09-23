@@ -1,7 +1,7 @@
 import random
-from ..chess.state import GameState
-from ..chess.board import Board
-from ..chess.rules import legal_moves
+from ..engine.chess.state import GameState
+from ..engine.chess.board import Board
+from ..engine.chess.rules import legal_moves
 
 def snapshot(state):
   return ([r[:] for r in state.board.state], state.side_to_move, state.castling_rights(), state.en_passant_square, state.halfmove_clock, state.fullmove_number)

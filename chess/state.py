@@ -20,6 +20,7 @@ class GameState:
     self.halfmove_clock, self.fullmove_number = halfmove_clock, fullmove_number
     self.move_history = []
     self.hash = compute_hash(self)
+    self.position_history = [self.hash]
 
   @classmethod
   def initial(cls):
@@ -33,6 +34,7 @@ class GameState:
     new_board.state = [r[:] for r in self.board.state]
     new_state = GameState(new_board, self.side_to_move, self.white_kingside, self.white_queenside, self.black_kingside, self.black_queenside, self.en_passant_square, self.halfmove_clock, self.fullmove_number)
     new_state.hash = self.hash
+    new_state.position_history = self.position_history[:]
     return new_state
 
   def make_move(self, move):
@@ -92,6 +94,7 @@ class GameState:
 
     self.side_to_move *= -1
     self.hash ^= SIDE_TO_MOVE
+    self.position_history.append(self.hash)
 
   def unmake_move(self):
     record = self.move_history.pop()
@@ -113,6 +116,7 @@ class GameState:
     self.halfmove_clock, self.fullmove_number = record.prev_halfmove_clock, record.prev_fullmove_number
     self.side_to_move *= -1
     self.hash = record.prev_hash
+    self.position_history.pop()
 
   def _update_castling_rights(self, piece, from_row, from_col, captured_piece, captured_square):
     if abs(piece) == 6:

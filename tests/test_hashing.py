@@ -1,7 +1,7 @@
 import random
-from ..engine.chess.state import GameState
-from ..engine.chess import zobrist
-from ..engine.chess.rules import legal_moves
+from engine.chess.state import GameState
+from engine.chess import zobrist
+from engine.chess.rules import legal_moves
 
 def test_initial_hash_matches_recompute():
   state = GameState.initial()

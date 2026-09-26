@@ -1,5 +1,5 @@
 import pygame
-from ..engine import Game
+from engine import Game
 
 game = Game()
 print('game initialized with ChessEnvironment:', hasattr(game, 'env'))

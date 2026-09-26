@@ -1,5 +1,5 @@
-from ..engine.environment.chess_environment import ChessEnvironment
-from ..engine.search.minmax import Search
+from engine.environment.chess_environment import ChessEnvironment
+from engine.search.minmax import Search
 
 env = ChessEnvironment()
 search = Search()

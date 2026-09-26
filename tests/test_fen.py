@@ -1,9 +1,9 @@
 import random
 import pytest
-from ..engine.chess.fen import parse_fen, to_fen
-from ..engine.chess.state import GameState
-from ..engine.chess.rules import legal_moves
-from ..engine.chess import zobrist
+from engine.chess.fen import parse_fen, to_fen
+from engine.chess.state import GameState
+from engine.chess.rules import legal_moves
+from engine.chess import zobrist
 
 STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 NO_CASTLING_FEN = '4k3/8/8/8/8/8/8/4K2R w - - 12 30'

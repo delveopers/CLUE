@@ -1,5 +1,5 @@
-from ..engine.chess.state import GameState
-from ..engine.chess.rules import legal_moves, result, is_terminal, ONGOING, WHITE_WIN, BLACK_WIN, DRAW
+from engine.chess.state import GameState
+from engine.chess.rules import legal_moves, result, is_terminal, ONGOING, WHITE_WIN, BLACK_WIN, DRAW
 
 def empty_state(side_to_move=1):
   state = GameState.initial()

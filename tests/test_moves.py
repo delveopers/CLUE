@@ -1,6 +1,6 @@
-from ..engine.chess.state import GameState
-from ..engine.chess.move import Move
-from ..engine.chess.move_generator import generate_pseudo_legal_moves
+from engine.chess.state import GameState
+from engine.chess.move import Move
+from engine.chess.move_generator import generate_pseudo_legal_moves
 
 def squares(moves):
   return {(m.to_row, m.to_col) for m in moves}

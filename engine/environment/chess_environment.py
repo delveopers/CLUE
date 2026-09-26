@@ -13,6 +13,9 @@ class ChessEnvironment:
   def legal_moves(self):
     return rules.legal_moves(self.state)
 
+  def legal_moves_for_square(self, row, col):
+    return rules.legal_moves_for_square(self.state, row, col)
+
   def make_move(self, move):
     self.state.make_move(move)
 

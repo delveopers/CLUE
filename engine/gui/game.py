@@ -1,29 +1,28 @@
 import pygame
-from .chess.board import Board
-from .evaluate import Evaluate
-from .search import Search
+from ..environment.chess_environment import ChessEnvironment
+from ..search.minmax import Search
+from ..chess import rules
 
 class Game:
   def __init__(self):
     pygame.init()
 
-    self.board, self.evaluate, self.search = Board(), Evaluate(), Search()
+    self.env, self.search = ChessEnvironment(), Search()
 
     self.screen_size = 1000
     self.screen = pygame.display.set_mode((self.screen_size, self.screen_size))
-    # pygame.display.set_caption("")  # to set caption
     self.font = pygame.font.SysFont(None, 36)
     self.clock = pygame.time.Clock()
     self.running = True
 
     self.square_size = int(self.screen_size / 10)
-    self.board_size = len(self.board.state)
+    self.board_size = len(self.env.current_state().board.state)
     self.piece_size = int(self.square_size * 0.8)
 
-    self.selected_square, self.curr_row, self.curr_col, self.active_team = None, None, None, 1
+    self.selected_square, self.curr_row, self.curr_col = None, None, None
     self.white_king_check_pos, self.black_king_check_pos = None, None
     self.promotion_possible, self.promotion_rects, self.matched_moves = False, {}, []
-    self.white_win, self.black_win, self.stalemate = False, False, False
+    self.white_win, self.black_win, self.is_draw = False, False, False
 
     self.piece_images = {
             1: pygame.transform.smoothscale(pygame.image.load('./engine/img/w_pawn_png_1024px.png'), (self.piece_size, self.piece_size)),
@@ -40,30 +39,30 @@ class Game:
             -6: pygame.transform.smoothscale(pygame.image.load('./engine/img/b_king_png_1024px.png'), (self.piece_size, self.piece_size)),
         }
 
+  def apply_result(self):
+    match self.env.get_result():
+      case rules.WHITE_WIN:
+        self.white_win = True
+      case rules.BLACK_WIN:
+        self.black_win = True
+      case rules.DRAW:
+        self.is_draw = True
+
   def check_click(self):
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         self.running = False
 
-      # handle clicks & user inputs on white turn
-      if self.active_team == 1:
+      if self.env.side_to_move() == 1:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
           if self.promotion_possible:
             for piece, rect in self.promotion_rects.items():
               if rect.collidepoint(event.pos):
                 for move in self.matched_moves:
-                  if piece == move[2]:
-                    self.board.move_piece(self.selected_square[0], self.selected_square[1], move[0], move[1], move[2])
+                  if piece == move.promotion:
+                    self.env.make_move(move)
                     self.selected_square, self.curr_row, self.curr_col = None, None, None
-                    self.active_team = -1
-                    match self.board.check_for_win(self.active_team):
-                      case 1:
-                        self.white_win = True
-                      case 0:
-                        self.stalemate = True
-                      case -1:
-                        self.black_win = True
-
+                    self.apply_result()
                     self.promotion_possible, self.matched_moves = False, []
                     return
             return
@@ -73,52 +72,37 @@ class Game:
 
           if 0 <= board_x < self.board_size * self.square_size and 0 <= board_y < self.board_size * self.square_size:
             col, row = board_x // self.square_size, board_y // self.square_size
-            piece = self.board.state[row][col]
+            piece = self.env.current_state().board.state[row][col]
             if self.selected_square is not None:
-              moves = self.board.get_legal_moves(self.selected_square[0], self.selected_square[1])
+              moves = self.env.legal_moves_for_square(self.selected_square[0], self.selected_square[1])
               legal_clicked_square = False
 
               for move in moves:
-                if row == move[0] and col == move[1]:
+                if row == move.to_row and col == move.to_col:
                   legal_clicked_square = True
                   break
 
               if legal_clicked_square:
-                matched_moves = []
-                for move in moves:
-                  if row == move[0] and col == move[1]:
-                    matched_moves.append(move)
+                matched_moves = [move for move in moves if row == move.to_row and col == move.to_col]
 
                 if len(matched_moves) > 1:
                   self.promotion_possible = True
-                  self.promotion_rects = matched_moves
+                  self.matched_moves = matched_moves
                   return
 
                 else:
                   move = matched_moves[0]
-                  self.board.move_piece(self.selected_square[0], self.selected_square[1], move[0], move[1], move[2])
+                  self.env.make_move(move)
                   self.selected_square, self.curr_row, self.curr_col = None, None, None
-
-                  self.active_team *= -1
-                  match self.board.check_for_win(self.active_team):
-                    case 1:
-                      self.white_win = True
-                    case 0:
-                      self.stalemate = True
-                    case -1:
-                      self.black_win = True
-
-                  w_in_check, b_in_check, w_king_pos, b_king_pos = self.board.king_check()
-                  self.white_king_check_pos = w_king_pos
-                  self.black_king_check_pos = b_king_pos
+                  self.apply_result()
                   continue
-              selected_piece = self.board.state[self.selected_square[0]][self.selected_square[1]]
+              selected_piece = self.env.current_state().board.state[self.selected_square[0]][self.selected_square[1]]
               selected_piece_team = 1 if selected_piece > 0 else -1
 
               if piece != 0:
                 clicked_piece_team = 1 if piece > 0 else -1
 
-                if clicked_piece_team == self.active_team:
+                if clicked_piece_team == self.env.side_to_move():
                   if clicked_piece_team == selected_piece_team:
                     self.curr_row, self.curr_col = row, col
                     self.selected_square = (row, col)
@@ -131,31 +115,23 @@ class Game:
             else:
               if piece != 0:
                 piece_team = 1 if piece > 0 else -1
-                if piece_team == self.active_team:
+                if piece_team == self.env.side_to_move():
                   self.curr_row, self.curr_col, self.selected_square = row, col, (row, col)
-      else:   # cpu takes turn
-        best_eval, best_move = self.search.minmax(self.board, -1, 2, -99999, 99999)
-        print(best_move)
+      else:
+        best_eval, best_move = self.search.minmax(self.env, -1, 2, -99999, 99999)
 
         if best_move is not None:
-          self.board.move_piece(best_move[0], best_move[1], best_move[2], best_move[3], best_move[4])
-          self.active_team = 1
+          self.env.make_move(best_move)
+          self.apply_result()
 
-          match self.board.check_for_win(self.active_team):
-            case 1:
-              self.white_win = True
-            case 0:
-              self.stalemate = True
-            case -1:
-              self.black_win = True
-
-      w_in_check, b_in_check, w_king_pos, b_king_pos = self.board.king_check()
+      w_in_check, b_in_check, w_king_pos, b_king_pos = self.env.current_state().board.king_check()
       self.white_king_check_pos = w_king_pos
       self.black_king_check_pos = b_king_pos
 
   def draw(self):
     self.screen.fill("#000000")
     self.promotion_rects = {}
+    board_state = self.env.current_state().board.state
 
     for row in range(self.board_size):
       for col in range(self.board_size):
@@ -168,8 +144,8 @@ class Game:
           pygame.draw.rect(self.screen, "red", (x, y, self.square_size, self.square_size), 4)
         if self.selected_square == (row, col):
           pygame.draw.rect(self.screen, "#D95A88", (x, y, self.square_size, self.square_size), 4)
-        piece = self.board.state[row][col]
-        if piece != 0 and piece != 7 and piece != -7:
+        piece = board_state[row][col]
+        if piece != 0:
           self.screen.blit(self.piece_images[piece], (x + self.square_size * 0.1, y + self.square_size * 0.1))
 
     if self.promotion_possible:
@@ -193,8 +169,8 @@ class Game:
       result_text = "White Wins"
     elif self.black_win:
       result_text = "Black Wins"
-    elif self.stalemate:
-      result_text = "Stalemate"
+    elif self.is_draw:
+      result_text = "Draw"
     if result_text is not None:
       pygame.draw.rect(self.screen, "white", (self.screen_size / 4, 15, self.screen_size / 2, 50))
       pygame.draw.rect(self.screen, "black", (self.screen_size / 4, 15, self.screen_size / 2, 50), 2)

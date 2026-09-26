@@ -1,7 +1,28 @@
-from collections import namedtuple
+import numpy as np
 
-PositionEncoding = namedtuple('PositionEncoding', ['pieces', 'side_to_move', 'white_kingside', 'white_queenside', 'black_kingside', 'black_queenside', 'en_passant_square'])
+NUM_PLANES = 18
+PIECE_PLANE = {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, -1: 6, -2: 7, -3: 8, -4: 9, -5: 10, -6: 11}
 
 def encode(state):
-  pieces = tuple(tuple(row) for row in state.board.state)
-  return PositionEncoding(pieces, state.side_to_move, state.white_kingside, state.white_queenside, state.black_kingside, state.black_queenside, state.en_passant_square)
+  planes = np.zeros((NUM_PLANES, 8, 8), dtype=np.float32)
+  board = state.board.state
+
+  for r in range(8):
+    for c in range(8):
+      piece = board[r][c]
+      if piece != 0:
+        planes[PIECE_PLANE[piece], r, c] = 1.0
+
+  if state.side_to_move == 1:
+    planes[12, :, :] = 1.0
+
+  if state.white_kingside: planes[13, :, :] = 1.0
+  if state.white_queenside: planes[14, :, :] = 1.0
+  if state.black_kingside: planes[15, :, :] = 1.0
+  if state.black_queenside: planes[16, :, :] = 1.0
+
+  if state.en_passant_square is not None:
+    r, c = state.en_passant_square
+    planes[17, r, c] = 1.0
+
+  return planes

@@ -36,10 +36,11 @@ def test_random_game_does_not_crash():
     depth += 1
   assert env.get_result() in (rules.ONGOING, rules.WHITE_WIN, rules.BLACK_WIN, rules.DRAW)
 
-def test_position_encoding_is_deterministic_and_hashable():
+def test_position_encoding_is_deterministic():
   env = ChessEnvironment()
-  encoded = encode(env.current_state())
-  assert hash(encoded) == hash(encode(env.current_state()))
+  encoded_a = encode(env.current_state())
+  encoded_b = encode(env.current_state())
+  assert (encoded_a == encoded_b).all()
 
 def test_move_encoder_round_trips_across_random_game():
   random.seed(4)

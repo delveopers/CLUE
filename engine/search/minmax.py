@@ -1,4 +1,4 @@
-from ..evaluate import Evaluate
+from ..evaluation.evaluate import Evaluate
 import logging
 
 logger = logging.getLogger(__name__)

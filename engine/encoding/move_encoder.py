@@ -1,15 +1,15 @@
 from ..chess import rules
 
-DIRECTIONS = [(1, 0), (0, 1), (-1, 0), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)]
-KNIGHT_OFFSET = [(2, 1), (2, -1), (1, 2), (1, -2), (-2, 1), (-2, -1), (-1, 2), (-1, -2)]
-UNDERPROMO_DIRECTIONS = [(-1, 0), (-1, -1), (-1, 1)]
+DIRECTIONS = [(-1,0), (-1,1), (0,1), (1,1), (1,0), (1,-1), (0,-1), (-1,-1)]
+KNIGHT_OFFSETS = [(-2,-1), (-2,1), (-1,-2), (-1,2), (1,-2), (1,2), (2,-1), (2,1)]
+UNDERPROMO_DIRECTIONS = [(-1,0), (-1,-1), (-1,1)]
 UNDERPROMO_PIECES = [2, 3, 4]
 
 PLANES_PER_SQUARE = 73
 ACTION_SPACE_SIZE = 8 * 8 * PLANES_PER_SQUARE
 
-def _canonical_row(row, side):
-  return row if side == 1 else 7 - row
+def _canonical_row(row, side_to_move):
+  return row if side_to_move == 1 else 7 - row
 
 def move_to_index(move, state):
   side = state.side_to_move
@@ -23,8 +23,8 @@ def move_to_index(move, state):
     dir_idx = UNDERPROMO_DIRECTIONS.index((dr, dc))
     piece_idx = UNDERPROMO_PIECES.index(move.promotion)
     plane = 64 + dir_idx * 3 + piece_idx
-  elif (dr, dc) in KNIGHT_OFFSET:
-    plane = 65 * KNIGHT_OFFSET.index((dr, dc))
+  elif (dr, dc) in KNIGHT_OFFSETS:
+    plane = 56 + KNIGHT_OFFSETS.index((dr, dc))
   else:
     distance = max(abs(dr), abs(dc))
     unit = (dr // distance, dc // distance)
@@ -42,12 +42,12 @@ def index_to_move(index, state):
     distance = dist_idx + 1
     rel_dr, rel_dc, promotion = dr * distance, dc * distance, None
   elif plane < 64:
-    rel_dr, rel_dc = KNIGHT_OFFSET[plane-56]
+    rel_dr, rel_dc = KNIGHT_OFFSETS[plane - 56]
     promotion = None
   else:
-    dir_idx, rel_dc = divmod(plane-64, 3)
+    dir_idx, piece_idx = divmod(plane - 64, 3)
     rel_dr, rel_dc = UNDERPROMO_DIRECTIONS[dir_idx]
-    promotion = None
+    promotion = UNDERPROMO_PIECES[piece_idx]
 
   to_row, to_col = from_row + rel_dr, from_col + rel_dc
   if not (0 <= to_row <= 7 and 0 <= to_col <= 7):
@@ -61,7 +61,7 @@ def index_to_move(index, state):
     piece = state.board.state[abs_from_row][abs_from_col]
     if abs(piece) == 1 and abs_to_row in (0, 7):
       promotion = 5
-  
+
   for move in rules.legal_moves(state):
     if move.from_row == abs_from_row and move.from_col == abs_from_col and move.to_row == abs_to_row and move.to_col == abs_to_col and move.promotion == promotion:
       return move

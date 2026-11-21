@@ -2,7 +2,7 @@ import pytest
 from engine.chess.pgn import iter_games, load_pgn_file, san_to_move, replay, PGNError
 from engine.chess.fen import parse_fen, to_fen
 from engine.chess.state import GameState
-from chess import rules
+from engine.chess import rules
 
 FOOLS_MATE = '[Event "fool"]\n[Result "0-1"]\n\n1. f3 e5 2. g4 Qh4# 0-1\n'
 SCHOLARS_MATE = '[Event "scholar"]\n[Result "1-0"]\n\n1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. Qxf7# 1-0\n'

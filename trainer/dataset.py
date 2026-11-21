@@ -4,7 +4,7 @@ from collections import OrderedDict
 from pathlib import Path
 from engine.chess.pgn import replay
 from engine.encoding.position_encoder import encode, NUM_PLANES
-from engine.encoding.move_encoder import move_to_index, index_to_move, ACTION_SPACE_SIZE
+from engine.encoding.move_encoder import move_to_index, ACTION_SPACE_SIZE
 
 MANIFEST = 'manifest.json'
 
@@ -48,7 +48,7 @@ class ShardWriter:
     (self.out_dir / MANIFEST).write_text(json.dumps(manifest, indent=2))
     return manifest
 
-def build_dateset(games, out_dir, shard_size=4096, shuffle_buffer=None, shuffle=True, seed=0, max_games=None):
+def build_dataset(games, out_dir, shard_size=4096, shuffle_buffer=None, shuffle=True, seed=0, max_games=None):
   writer = ShardWriter(out_dir, shard_size, shuffle_buffer, shuffle, seed)
   games_used = game_skipped = 0
 

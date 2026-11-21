@@ -2,7 +2,7 @@ import json
 import numpy as np
 import pytest
 from collections import Counter
-from chess.pgn import iter_games, replay
+from engine.chess.pgn import iter_games, replay
 from engine.encoding.position_encoder import encode
 from engine.encoding.move_encoder import index_to_move
 from trainer.dataset import build_dataset, ShardDataset, iter_batches

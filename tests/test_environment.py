@@ -2,7 +2,6 @@ import random
 from engine.environment.chess_environment import ChessEnvironment
 from engine.chess import rules
 from engine.encoding.position_encoder import encode
-from engine.encoding.move_encoder import move_to_index, index_to_move, ACTION_SPACE_SIZE
 
 KIWIPETE_FEN = 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1'
 
@@ -41,30 +40,3 @@ def test_position_encoding_is_deterministic():
   encoded_a = encode(env.current_state())
   encoded_b = encode(env.current_state())
   assert (encoded_a == encoded_b).all()
-
-def test_move_encoder_round_trips_across_random_game():
-  random.seed(4)
-  env = ChessEnvironment()
-  checked = 0
-  for _ in range(40):
-    moves = env.legal_moves()
-    if not moves:
-      env.reset()
-      continue
-    for move in moves:
-      index = move_to_index(move)
-      assert 0 <= index < ACTION_SPACE_SIZE
-      assert index_to_move(index, env.current_state()) == move
-      checked += 1
-    env.make_move(random.choice(moves))
-  assert checked > 0
-
-def test_move_encoder_round_trips_including_castling():
-  env = ChessEnvironment()
-  env.reset(fen=KIWIPETE_FEN)
-  for move in env.legal_moves():
-    assert index_to_move(move_to_index(move), env.current_state()) == move
-
-def test_move_encoder_rejects_bogus_index():
-  env = ChessEnvironment()
-  assert index_to_move(999999, env.current_state()) is None

@@ -13,7 +13,7 @@ class ShardWriter:
     self.out_dir = Path(out_dir)
     self.out_dir.mkdir(parents=True, exist_ok=True)
     self.shard_size, self.shuffle = shard_size, shuffle
-    self.shuffle_buffer = shuffle_buffer if shuffle else shard_size * 8
+    self.shuffle_buffer = shuffle_buffer or shard_size * 8
     self.rng = np.random.default_rng(seed)
     self.planes, self.policy, self.value, self.shards = [], [], [], []
 
@@ -36,33 +36,30 @@ class ShardWriter:
     full = count if final else (count // self.shard_size) * self.shard_size
     for start in range(0, full, self.shard_size):
       stop = min(start + self.shard_size, full)
-      name = f"shard_{len(self.shards):05d}.npz"
+      name = f'shard_{len(self.shards):05d}.npz'
       np.savez_compressed(self.out_dir / name, planes=planes[start:stop], policy=policy[start:stop], value=value[start:stop])
-      self.shards.append({'file': name, 'count': stop-start})
-    self.planes, self.policy, self.value = list(planes[full:]), list(planes[full:]), list(value[full:])
+      self.shards.append({'file': name, 'count': stop - start})
+    self.planes, self.policy, self.value = list(planes[full:]), list(policy[full:]), list(value[full:])
 
-  def close(self, game_used=0, game_skipped=0):
+  def close(self, games_used=0, games_skipped=0):
     self._write(final=True)
-    manifest = {'num_planes': NUM_PLANES, 'action_space_size': ACTION_SPACE_SIZE, 'shard_size': self.shard_size, 'num_positions': sum(s['count'] for s in self.shards),
-                'num_games': game_used, 'games_skipped_unknown_result': game_skipped, 'shards': self.shards}
+    manifest = {'num_planes': NUM_PLANES, 'action_space_size': ACTION_SPACE_SIZE, 'shard_size': self.shard_size, 'num_positions': sum(s['count'] for s in self.shards), 'num_games': games_used, 'games_skipped_unknown_result': games_skipped, 'shards': self.shards}
     (self.out_dir / MANIFEST).write_text(json.dumps(manifest, indent=2))
     return manifest
 
 def build_dataset(games, out_dir, shard_size=4096, shuffle_buffer=None, shuffle=True, seed=0, max_games=None):
   writer = ShardWriter(out_dir, shard_size, shuffle_buffer, shuffle, seed)
-  games_used = game_skipped = 0
-
+  games_used = games_skipped = 0
   for game in games:
     if max_games is not None and games_used >= max_games: break
     if game.result is None:
-      game_skipped += 1
+      games_skipped += 1
       continue
 
     for state, move in replay(game):
       writer.add(encode(state).astype(np.uint8), move_to_index(move, state), game.result * state.side_to_move)
-      games_used += 1
-
-  return writer.close(games_used, game_skipped)
+    games_used += 1
+  return writer.close(games_used, games_skipped)
 
 class ShardDataset:
   def __init__(self, directory, cache_size=2):

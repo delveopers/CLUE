@@ -72,7 +72,7 @@ class ShardDataset:
       raise ValueError(f'dataset was built with planes={manifest["num_planes"]}, actions={manifest["action_space_size"]}; current encoding is planes={NUM_PLANES}, actions={ACTION_SPACE_SIZE}')
 
     self.shards = manifest['shards']
-    self.offsets = np.cumsum([0] + (s['count'] for s in self.shards))
+    self.offsets = np.cumsum([0] + [s['count'] for s in self.shards])
 
   def __len__(self):
     return int(self.offsets[-1])

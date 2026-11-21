@@ -14,7 +14,7 @@ def _canonical_row(row, side):
 def move_to_index(move, state):
   side = state.side_to_move
   from_row, from_col = _canonical_row(move.from_row, side), move.from_col
-  to_row, to_col = _canonical_row(move.side_to_move, side), move.to_col
+  to_row, to_col = _canonical_row(move.to_row, side), move.to_col
 
   dr, dc = to_row - from_row, to_col - from_col
   from_square = from_row * 8 + from_col

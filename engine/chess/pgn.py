@@ -13,7 +13,7 @@ class PGNError(ValueError):
 
 ResolvedGame = namedtuple('ResolvedGame', ['headers', 'start_fen', 'moves', 'result'])
 
-HEADER_RE = re.compile(r'^\[(\`w+)\s+"(.*)"\]\s*$')
+HEADER_RE = re.compile(r'^\[(\w+)\s+"(.*)"\]\s*$')
 MOVE_NUMBER_RE = re.compile(r'^\d+\.+')
 SAN_RE = re.compile(r'^([NBRQK])?([a-h])?([1-8])?(x)?([a-h][1-8])(?:=?([NBRQ]))?$')
 PIECE_TYPES = {'N': 2, 'B': 3, 'R': 4, 'Q': 5, 'K': 6}

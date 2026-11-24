@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from dataclasses import dataclass, asdict
-from chess import rules
+from engine.chess import rules
 from engine.encoding.position_encoder import encode, NUM_PLANES
 from engine.encoding.move_encoder import move_to_index, ACTION_SPACE_SIZE, PLANES_PER_SQUARE
 
